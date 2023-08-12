@@ -1,4 +1,4 @@
 import requests
 
-r = requests.get('http://localhost:3000/checkout?dataset=test-ds&timeout=60', timeout=30)
+r = requests.get('http://localhost:4000/checkout?dataset=test-ds&lang=it&timeout=60', timeout=30)
 print(r.json())

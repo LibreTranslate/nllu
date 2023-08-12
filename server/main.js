@@ -9,6 +9,7 @@ const exists = promisify(fs.exists);
 const readdir = promisify(fs.readdir);
 const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
+const stat = promisify(fs.stat);
 
 const clone = (obj) => {
   return JSON.parse(JSON.stringify(obj));
@@ -154,7 +155,6 @@ app.post('/commit', handler(async (req, res) => {
   const batches = await getBatchesForLang(dataset, ds.batches, lang, ds.phrases.length);
   const batch = batches.find(b => b.batchId === batchId);
   if (!batch) throw new Error("Invalid batchId");
-  console.log(batch.range[1], batch.range[0], phrases.length,  batch.range[1] - batch.range[0] + 1)
   if (phrases.length !== batch.range[1] - batch.range[0] + 1) throw new Error("Phrase length must match batch phrase length");
 
   // All good, write to file
@@ -172,6 +172,37 @@ app.post('/commit', handler(async (req, res) => {
   batch.done = true;
 
   res.json({success: true});
+}));
+
+app.get('/download', handler(async (req, res) => {
+  let { dataset, lang } = req.query;
+  dataset = sanitize(dataset);
+  lang = sanitize(lang);
+  if (!dataset) throw new Error("Invalid dataset");
+  if (!lang) throw new Error("Invalid lang");
+
+  const ds = await getDataset(dataset);
+  const batches = await getBatchesForLang(dataset, ds.batches, lang, ds.phrases.length);
+  if (!batches.find(b => !b.done)){
+    for (let idx = 0; idx < batches.length; idx++){
+      const filePath = `data/${dataset}/${lang}/${idx}.txt`;
+      if (!await exists(filePath)) throw new Error(`batch ${idx} is missing (this should have not happened)`);
+    }
+    
+    const fname = `${dataset}-${lang}.txt`;
+    res.setHeader('Content-Disposition', `attachment; filename=${fname}`);
+    res.setHeader('Content-Type', 'text/plain');
+    // res.setHeader('Content-Length', );
+    console.log(`Downloading ${batches.length} batches from ${dataset}/${lang}`);
+
+    for (let idx = 0; idx < batches.length; idx++){
+      const filePath = `data/${dataset}/${lang}/${idx}.txt`;
+      const filestream = fs.createReadStream(filePath);
+      filestream.pipe(res);
+    }
+  }else{
+    res.json({error: `${dataset} - ${lang} not done`});
+  }
 }));
 
 app.use((err, req, res, next) => {

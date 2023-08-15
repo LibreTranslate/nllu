@@ -1,6 +1,8 @@
+const { once } = require('events');
 const express = require('express');
 const fs = require('fs');
 const promisify = require('util').promisify;
+const readline = require('readline');
 const app = express();
 app.use(express.json());
 
@@ -70,20 +72,33 @@ let getDataset = async (d) =>{
     d = sanitize(d);
     let source = `data/${d}/source.txt`;
     if (await exists(source)){
-      phrases = (await readFile(source)).toString()
-                .split("\n")
-                .map(p => p.trim())
-                .filter(p => p !== "");
-      console.log(`Read ${phrases.length} phrases from ${source}`);
-
-      let batches = await initBatches(d, phrases.length);
+      return new Promise((resolve, reject) => {
+        try{
+          console.log(`Reading ${source}`);
+          const phrases = [];
+          const instream = fs.createReadStream(source);
+          const rl = readline.createInterface({input: instream, crlfDelay: Infinity});
+          rl.on('line', line => {
+            line = line.trim();
+            if (line !== "") phrases.push(line);
+          });
+          rl.on('close', async () => {
+            console.log(`Read ${phrases.length} phrases from ${source}`);
       
-      datasets[d] = {
-        phrases,
-        batches
-      };
-
-      return datasets[d];
+            let batches = await initBatches(d, phrases.length);
+            
+            datasets[d] = {
+              phrases,
+              batches
+            };
+      
+            resolve(datasets[d]);
+          });
+        }catch(e){
+          reject(e);
+        }
+      });
+      
     }else{
       throw new Error(`${d} does not exist`);
     }

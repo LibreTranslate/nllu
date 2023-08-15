@@ -26,6 +26,10 @@ parser.add_argument('--batch-size',
     type=int,
     default=64,
     help='Batch size. Default: %(default)s')
+parser.add_argument('--split',
+    action='store_true',
+    default=False,
+    help='Split input in batch sizes chunks. Default: %(default)s')
 parser.add_argument('--checkout-timeout',
     type=int,
     default=86400,
@@ -230,30 +234,46 @@ while True:
     now = time.time()
     print("Translating...")
 
-    src_text = res['phrases']
-    src_text = [sent.strip() for sent in src_text]
-    tgt_prefix = [[tgt_lang]] * len(src_text)
+    translations = []
 
-    # Subword the source sentences
-    src_subworded = sp.encode_as_pieces(src_text)
-    src_subworded = [[src_lang] + sent + ["</s>"] for sent in src_subworded]
+    def translate_phrases(phrases):
+        global batch_size, translations
+        if len(phrases) == 0:
+            return []
 
-    # Translate the source sentences
-    while True:
-        try:
-            translations_subworded = translator.translate_batch(src_subworded, batch_type="tokens", max_batch_size=batch_size, beam_size=args.beam_size, target_prefix=tgt_prefix, return_scores=False)
-            break
-        except RuntimeError as e:
-            if "out of memory" in str(e) and batch_size > 1:
-                batch_size //= 2
-                print(str(e) + f", setting batch size to {batch_size}")
-    translations_subworded = [translation.hypotheses[0] for translation in translations_subworded]
-    for translation in translations_subworded:
-        if tgt_lang in translation:
-            translation.remove(tgt_lang)
+        src_text = [sent.strip() for sent in phrases]
+        tgt_prefix = [[tgt_lang]] * len(src_text)
 
-    # Desubword the target sentences
-    translations = sp.decode(translations_subworded)
+        # Subword the source sentences
+        src_subworded = sp.encode_as_pieces(src_text)
+        src_subworded = [[src_lang] + sent + ["</s>"] for sent in src_subworded]
+
+        # Translate the source sentences
+        while True:
+            try:
+                translations_subworded = translator.translate_batch(src_subworded, batch_type="tokens", max_batch_size=batch_size, beam_size=args.beam_size, target_prefix=tgt_prefix, return_scores=False)
+                break
+            except RuntimeError as e:
+                if "out of memory" in str(e) and batch_size > 1:
+                    batch_size //= 2
+                    print(str(e) + f", setting batch size to {batch_size}")
+        translations_subworded = [translation.hypotheses[0] for translation in translations_subworded]
+        for translation in translations_subworded:
+            if tgt_lang in translation:
+                translation.remove(tgt_lang)
+
+        # Desubword the target sentences
+        translations += sp.decode(translations_subworded)
+    
+    if args.split:
+        i = 0
+        while i < len(res['phrases']):
+            translate_phrases(res['phrases'][i:i+batch_size])
+            i += batch_size
+    else:
+        translate_phrases(res['phrases'])
+
+    
     print("Completed in %s seconds, committing..." % (time.time() - now))
 
     s_post('/commit', {

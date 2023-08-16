@@ -32,7 +32,7 @@ parser.add_argument('--split',
     help='Split input in batch sizes chunks. Default: %(default)s')
 parser.add_argument('--checkout-timeout',
     type=int,
-    default=86400,
+    default=3600,
     help='Checkout timeout')
 parser.add_argument('--model',
     type=str,
@@ -233,7 +233,6 @@ while True:
 
     now = time.time()
     print("Translating...")
-
     translations = []
 
     def translate_phrases(phrases):
@@ -265,14 +264,24 @@ while True:
         # Desubword the target sentences
         translations += sp.decode(translations_subworded)
     
-    if args.split:
-        i = 0
-        while i < len(res['phrases']):
-            translate_phrases(res['phrases'][i:i+batch_size])
-            i += batch_size
-    else:
-        translate_phrases(res['phrases'])
-
+    while True:
+        try:
+            if args.split:
+                i = 0
+                while i < len(res['phrases']):
+                    translate_phrases(res['phrases'][i:i+batch_size])
+                    i += batch_size
+            else:
+                translate_phrases(res['phrases'])
+            break
+        except RuntimeError as e:
+            if "out of memory" in str(e) and batch_size > 1:
+                batch_size //= 2
+                translations = []
+                print(str(e) + f", setting batch size to {batch_size}")
+            else:
+                print(str(e))
+                exit(1)
     
     print("Completed in %s seconds, committing..." % (time.time() - now))
 

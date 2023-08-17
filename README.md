@@ -65,7 +65,7 @@ cd nllu/server/<dataset>/<lang>
 cat *.txt > ../merged.txt
 ```
 
-### Filtering Results
+### Filter Results
 
 We provide a script to filter the backtranslated data, following the recommendations of the NLLB paper:
 

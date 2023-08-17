@@ -4,7 +4,7 @@ In 2022 Meta released [NLLB](https://arxiv.org/pdf/2207.04672.pdf), a set of mul
 
 This repository contains the software to run NLLU, an effort to run NLLB inference at scale to generate a corpus of bitext data that can be used to train new, permissively licensed language models.
 
-Running NLLB inference on million of sentences is intensive and it would take years to perform on a single machine. We designed a simple server architecture which can distribute batches of sentences to be translated asynchronously across machines, which can be rented cheaply with providers such as [vast.ai](https://vast.ai] or [runpod.io](https://runpod.io).
+Running NLLB inference on million of sentences is intensive and it would take years to perform on a single machine. We designed a simple server architecture which can distribute batches of sentences to be translated asynchronously across machines, which can be rented cheaply with providers such as [vast.ai](https://vast.ai) or [runpod.io](https://runpod.io).
 
 ## Datasets
 

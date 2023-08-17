@@ -36,15 +36,38 @@ Listening on port 5555
 ### Client
 
 ```bash
-docker run -ti --rm --gpus=all libretranslate/nllu --server http://<ip>:5555 --dataset <dataset> --batch-size 4 --split
+docker run -ti --rm --gpus=all libretranslate/nllu --server http://<ip>:5555 --dataset <dataset> --target-lang <langcode> --batch-size 4 --split
 ```
 
 We recommend tweaking `batch-size` to increase the translation speed, although in our experience it's actually faster to set this value to `1`. `--split` will reduce memory usage on the GPU by loading only `batch-size` sentences at a time during translation.
+
+You should tweak the `--checkout-timeout` option, expressed in seconds, if you expect a client to process a batch in longer than 1 hour (the default).
 
 #### Rebuild Docker Image
 
 ```bash
 docker build -t youruser/nllu .
+```
+
+### Download Results
+
+Once the entire dataset is translated, one can download it by visiting:
+
+http://<ip>/download?dataset=<dataset>&lang=<lang>
+
+Or by issuing:
+
+```bash
+cd nllu/server/<dataset>/<lang>
+cat *.txt > ../merged.txt
+```
+
+### Filtering Results
+
+We provide a script to filter the backtranslated data, following the recommendations of the NLLB paper:
+
+```bash
+python filter.py source.txt merged.txt <lang>
 ```
 
 ## License

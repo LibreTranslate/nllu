@@ -34,7 +34,7 @@ node main.js -p 5555 --batch-size 100
 Listening on port 5555
 ```
 
-The server has persistency built-in, so you can restart it without losing state information.
+The server has persistency built-in, so you can restart it without losing state information (just don't change batch-size between restarts).
 
 ### Client
 

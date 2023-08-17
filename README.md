@@ -16,6 +16,8 @@ We started backtranslating 15 million sentences sampled from [Paracrawl](https:/
 
 ### Server
 
+We use (NodeJS)[https://nodejs.org] for the server application.
+
 ```bash
 git clone https://github.com/LibreTranslate/nllu
 cd nllu/server

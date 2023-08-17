@@ -56,7 +56,7 @@ docker build -t youruser/nllu .
 
 Once the entire dataset is translated, one can download it by visiting:
 
-http://<ip>/download?dataset=<dataset>&lang=<lang>
+`http://<ip>/download?dataset=<dataset>&lang=<lang>`
 
 Or by issuing:
 

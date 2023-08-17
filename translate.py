@@ -190,8 +190,6 @@ if device == "cuda":
 sp = spm.SentencePieceProcessor()
 sp.load(sp_model_path)
 
-translator = ctranslate2.Translator(ct_model_path, device, device_index=device_index)
-
 def s_req(func, endpoint, **kwargs):
     retries = 0
     while retries < 10:
@@ -217,7 +215,7 @@ def s_post(endpoint, data):
     return s_req(requests.post, endpoint, json=data)
 
 # Fetch from server
-translator = ctranslate2.Translator(ct_model_path, device=device, compute_type="auto", inter_threads=os.cpu_count())
+translator = ctranslate2.Translator(ct_model_path, device=device, device_index=device_index, compute_type="auto", inter_threads=os.cpu_count())
 
 while True:
     res = s_get(f'/checkout?dataset={args.dataset}&lang={args.target_lang}&timeout={args.checkout_timeout}')

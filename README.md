@@ -16,7 +16,7 @@ We started backtranslating 15 million sentences sampled from [Paracrawl](https:/
 
 ### Server
 
-We use (NodeJS)[https://nodejs.org] for the server application.
+We use [NodeJS](https://nodejs.org) for the server.
 
 ```bash
 git clone https://github.com/LibreTranslate/nllu
@@ -34,6 +34,7 @@ node main.js -p 5555 --batch-size 100
 Listening on port 5555
 ```
 
+The server has persistency built-in, so you can restart it without losing state information.
 
 ### Client
 

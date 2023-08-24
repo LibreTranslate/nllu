@@ -105,7 +105,7 @@ with open(source_dst, "w", encoding="utf-8") as fs:
             
             # Filter prefix noise from NLLB
             if tgt.startswith("- ") and not src.startswith("- "):
-                tgt = tgt.removeprefix("- ")
+                tgt = tgt[2:]
 
             fs.write(src + "\n")
             ft.write(tgt + "\n")

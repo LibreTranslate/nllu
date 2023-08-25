@@ -8,9 +8,9 @@ Running NLLB inference on million of sentences is intensive and it would take ye
 
 ## Datasets
 
-**Coming soon!**
+See https://nllu.libretranslate.com
 
-We started backtranslating 15 million sentences sampled from [Paracrawl](https://paracrawl.eu/) from English to Italian using the 3.3B NLLB model.
+We welcome requests/contributions/help for new adding more datasets and languages! [Get in touch](https://community.libretranslate.com).
 
 ## Usage
 

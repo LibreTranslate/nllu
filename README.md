@@ -8,9 +8,9 @@ Running NLLB inference on million of sentences is intensive and it would take ye
 
 ## Datasets
 
-See https://nllu.libretranslate.com
+Visit: https://nllu.libretranslate.com
 
-We welcome requests/contributions/help for new adding more datasets and languages! [Get in touch](https://community.libretranslate.com).
+We welcome requests/contributions for adding more datasets and languages! [Get in touch](https://community.libretranslate.com).
 
 ## Usage
 

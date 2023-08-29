@@ -16,6 +16,9 @@ parser.add_argument('target_lang',
     type=str,
     default=None,
     help='Language code of target .txt file')
+parser.add_argument('--skip-length-filter',
+    action='store_true',
+    help='Skip length filtering')
 parser.add_argument('--force',
     action='store_true',
     help='Overwrite files')
@@ -79,16 +82,17 @@ with open(source_dst, "w", encoding="utf-8") as fs:
                 unknown_skip += 1
                 continue
 
-            # Skip is length ratio is exceeded
-            thresh = 9.0
-            if len_tgt / len_src > thresh or len_src / len_tgt > thresh:
-                length_ratio_skip += 1
-                continue
+            if not args.skip_length_filter:
+                # Skip is length ratio is exceeded
+                thresh = 9.0
+                if len_tgt / len_src > thresh or len_src / len_tgt > thresh:
+                    length_ratio_skip += 1
+                    continue
 
-            # Skip really short translations
-            if len_tgt < 15.0:
-                length_skip += 1
-                continue
+                # Skip really short translations
+                if len_tgt < 15.0:
+                    length_skip += 1
+                    continue
 
             # Remove punctuation, non-printable chars
             src_k = re.sub(r'[^\w\s]+', '', src)

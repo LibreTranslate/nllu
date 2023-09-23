@@ -198,6 +198,7 @@ app.get('/download', handler(async (req, res) => {
 
   const ds = await getDataset(dataset);
   const batches = await getBatchesForLang(dataset, ds.batches, lang, ds.phrases.length);
+
   if (!batches.find(b => !b.done)){
     for (let idx = 0; idx < batches.length; idx++){
       const filePath = `data/${dataset}/${lang}/${idx}.txt`;
@@ -211,8 +212,9 @@ app.get('/download', handler(async (req, res) => {
     console.log(`Downloading ${batches.length} batches from ${dataset}/${lang}`);
 
     let sendFile = (idx) => {
-      if (idx > batches.length){
-        return res.end();
+      if (idx >= batches.length){
+        res.end();
+        return; 
       }
       
       const filePath = `data/${dataset}/${lang}/${idx}.txt`;

@@ -210,11 +210,25 @@ app.get('/download', handler(async (req, res) => {
     // res.setHeader('Content-Length', );
     console.log(`Downloading ${batches.length} batches from ${dataset}/${lang}`);
 
-    for (let idx = 0; idx < batches.length; idx++){
+    let sendFile = (idx) => {
+      if (idx > batches.length){
+        return res.end();
+      }
+      
       const filePath = `data/${dataset}/${lang}/${idx}.txt`;
       const filestream = fs.createReadStream(filePath);
-      filestream.pipe(res);
+
+      filestream.on('error', (error) => {
+        console.error("Error: ", error);
+        res.status(500).send(`Error while downloading ${filePath}`);
+      });
+
+      filestream.pipe(res, { end: false });
+      filestream.on('end', () => {
+        sendFile(idx + 1);
+      });
     }
+    sendFile(0);
   }else{
     res.json({error: `${dataset} - ${lang} not done`});
   }

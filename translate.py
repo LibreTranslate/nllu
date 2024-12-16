@@ -95,6 +95,7 @@ nllb_langs = {
     "it":"ita_Latn",
     "jv":"jav_Latn",
     "ja":"jpn_Jpan",
+    "kab":"kab_Latn",
     "kn":"kan_Knda",
     "ka":"kat_Geor",
     "kk":"kaz_Cyrl",

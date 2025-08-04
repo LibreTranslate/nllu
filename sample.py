@@ -26,7 +26,7 @@ if os.path.isfile(source_dst):
     print("File exists: %s exiting..." % source_dst)
     exit(1)
 if os.path.isfile(target_dst):
-    pritn("File exists: %s exiting..." % target_dst)
+    print("File exists: %s exiting..." % target_dst)
     exit(1)
 
 print("Reading %s" % args.source)
